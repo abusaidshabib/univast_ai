@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import pandas as pd
 import pickle
-from .serializers import PredictionSerializer
+from .serializers import PredictionSerializer, PredictionResponseSerializer
 import os
 
 MODEL_PATH = 'model_files/model.pkl'
@@ -20,13 +20,19 @@ def create_list_data(list_data):
     df = pd.read_csv(csv_file_path)
     features = df.columns.tolist()
     random_values = {}
+    
+    # Select random values for each feature from the CSV data
     for feature in features:
         random_value = df[feature].sample(n=1).values[0]
         random_values[feature] = random_value
+    
+    # Add missing fields to each data dictionary in list_data
     for data in list_data:
         for feature in features:
             if feature not in data and feature != 'target':
                 data[feature] = random_values[feature]
+    
+    # Remove the 'target' field if present
     if 'target' in list_data[-1]:
         del list_data[-1]['target']
 
@@ -44,26 +50,33 @@ class PredictView(APIView):
                 serializer = PredictionSerializer(data=request.data)
 
             if serializer.is_valid():
-                print("done")
                 data = serializer.validated_data
-                all_predictions = []
+
                 if isinstance(data, list):
-                    for item in data:
-                        predictions = model.predict(pd.DataFrame([item]))
-                        all_predictions.extend(predictions)
-                        print("Predictions:", predictions)
+                    df = pd.DataFrame(data)
                 else:
-                    predictions = model.predict(pd.DataFrame([data]))
-                    all_predictions.extend(predictions)
-                    print("Predictions:", predictions)
-                return Response({'predictions': all_predictions}, status=status.HTTP_200_OK)
-            else:
-                def convert_to_dataframe(data):
-                    return pd.DataFrame(data)
-                list_data = create_list_data(request.data)
-                df = convert_to_dataframe(list_data)
+                    df = pd.DataFrame([data])
+
                 predictions = model.predict(df)
-                return Response({'prediction': predictions}, status=status.HTTP_200_OK)
+                response_data = []
+                for i in range(len(data)):
+                    response_data.append({
+                        **data[i],
+                        'prediction': predictions[i]
+                    })
+                return Response(response_data, status=status.HTTP_200_OK)
+            else:
+                list_data = create_list_data(request.data)
+                df = pd.DataFrame(list_data)
+                predictions = model.predict(df)
+                response_data = []
+                for i in range(len(list_data)):
+                    response_data.append({
+                        **list_data[i],
+                        'prediction': predictions[i]
+                    })
+                return Response(response_data, status=status.HTTP_200_OK)
+
         except Exception as e:
             error_message = str(e)
             return Response({'error': error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
