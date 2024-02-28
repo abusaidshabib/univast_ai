@@ -1,15 +1,13 @@
-# serializers.py
 from rest_framework import serializers
 
-class PredictionInputSerializer(serializers.Serializer):
-    # Define serializer fields based on the extracted feature names
+class PredictionSerializer(serializers.Serializer):
     marital_status = serializers.IntegerField()
     application_mode = serializers.IntegerField()
     application_order = serializers.IntegerField()
     course = serializers.IntegerField()
     daytime_evening_attendance = serializers.IntegerField()
     previous_qualification = serializers.IntegerField()
-    nationality = serializers.IntegerField()
+    nacionality = serializers.IntegerField()
     mothers_qualification = serializers.IntegerField()
     fathers_qualification = serializers.IntegerField()
     mothers_occupation = serializers.IntegerField()
@@ -37,3 +35,6 @@ class PredictionInputSerializer(serializers.Serializer):
     unemployment_rate = serializers.FloatField()
     inflation_rate = serializers.FloatField()
     gdp = serializers.FloatField()
+
+def validate(self, data):
+        return data
