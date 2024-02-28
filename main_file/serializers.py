@@ -38,3 +38,6 @@ class PredictionSerializer(serializers.Serializer):
 
     def validate(self, data):
         return data
+
+class PredictionResponseSerializer(serializers.Serializer):
+    target = serializers.FloatField()

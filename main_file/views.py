@@ -15,7 +15,7 @@ def load_model(model_path):
         model = pickle.load(f)
     return model
 
-def get_list_data(request_data):
+def create_list_data(list_data):
     csv_file_path = os.path.join('model_files', 'dataset.csv')
     df = pd.read_csv(csv_file_path)
     features = df.columns.tolist()
@@ -23,11 +23,12 @@ def get_list_data(request_data):
     for feature in features:
         random_value = df[feature].sample(n=1).values[0]
         random_values[feature] = random_value
-    list_data = request_data
     for data in list_data:
         for feature in features:
-            if feature not in data:
+            if feature not in data and feature != 'target':
                 data[feature] = random_values[feature]
+    if 'target' in list_data[-1]:
+        del list_data[-1]['target']
 
     return list_data
 
@@ -57,8 +58,12 @@ class PredictView(APIView):
                     print("Predictions:", predictions)
                 return Response({'predictions': all_predictions}, status=status.HTTP_200_OK)
             else:
-                list_data = get_list_data(request.data)
-                return Response({'prediction': list_data}, status=status.HTTP_200_OK)
+                def convert_to_dataframe(data):
+                    return pd.DataFrame(data)
+                list_data = create_list_data(request.data)
+                df = convert_to_dataframe(list_data)
+                predictions = model.predict(df)
+                return Response({'prediction': predictions}, status=status.HTTP_200_OK)
         except Exception as e:
             error_message = str(e)
             return Response({'error': error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
