@@ -16,7 +16,7 @@ def load_model(model_path):
     return model
 
 def get_list_data(request_data):
-    csv_file_path = os.path.join('model_files', 'new_file.csv')
+    csv_file_path = os.path.join('model_files', 'dataset.csv')
     df = pd.read_csv(csv_file_path)
     features = df.columns.tolist()
     random_values = {}

@@ -1,17 +1,17 @@
 from rest_framework import serializers
 
 class PredictionSerializer(serializers.Serializer):
-    marital_status = serializers.IntegerField()
+    marital = serializers.IntegerField()
     application_mode = serializers.IntegerField()
     application_order = serializers.IntegerField()
-    course = serializers.IntegerField()
-    daytime_evening_attendance = serializers.IntegerField()
-    previous_qualification = serializers.IntegerField()
-    nacionality = serializers.IntegerField()
+    courses_taught = serializers.IntegerField()
+    education_shift = serializers.IntegerField()
+    education = serializers.IntegerField()
+    nationality = serializers.IntegerField()
     mothers_qualification = serializers.IntegerField()
     fathers_qualification = serializers.IntegerField()
-    mothers_occupation = serializers.IntegerField()
-    fathers_occupation = serializers.IntegerField()
+    mother_occupation = serializers.IntegerField()
+    father_occupation = serializers.IntegerField()
     displaced = serializers.IntegerField()
     educational_special_needs = serializers.IntegerField()
     debtor = serializers.IntegerField()
@@ -36,5 +36,5 @@ class PredictionSerializer(serializers.Serializer):
     inflation_rate = serializers.FloatField()
     gdp = serializers.FloatField()
 
-def validate(self, data):
+    def validate(self, data):
         return data
