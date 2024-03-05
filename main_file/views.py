@@ -58,24 +58,24 @@ class PredictView(APIView):
                     df = pd.DataFrame([data])
 
                 predictions = model.predict(df)
-                response_data = []
-                for i in range(len(data)):
-                    response_data.append({
-                        **data[i],
-                        'prediction': predictions[i]
-                    })
-                return Response(response_data, status=status.HTTP_200_OK)
+                # response_data = []
+                # for i in range(len(data)):
+                #     response_data.append({
+                #         # **data[i],
+                #         'prediction': predictions[i]
+                #     })
+                return Response(predictions, status=status.HTTP_200_OK)
             else:
                 list_data = create_list_data(request.data)
                 df = pd.DataFrame(list_data)
                 predictions = model.predict(df)
-                response_data = []
-                for i in range(len(list_data)):
-                    response_data.append({
-                        **list_data[i],
-                        'prediction': predictions[i]
-                    })
-                return Response(response_data, status=status.HTTP_200_OK)
+                # response_data = []
+                # for i in range(len(list_data)):
+                #     response_data.append({
+                #         # **list_data[i],
+                #         'prediction': predictions[i]
+                #     })
+                return Response(predictions, status=status.HTTP_200_OK)
 
         except Exception as e:
             error_message = str(e)
