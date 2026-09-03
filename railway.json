@@ -1,0 +1,11 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE"
+  },
+  "deploy": {
+    "startCommand": "gunicorn univast_ai.wsgi:application --bind 0.0.0.0:$PORT --workers 2",
+    "healthcheckPath": "/api/v4/predict/",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}

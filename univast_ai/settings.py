@@ -3,17 +3,22 @@ from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
-DEBUG = config("DEBUG", default=True, cast=bool)
-ALLOWED_HOSTS = ["*", "localhost", "127.0.0.1"]
-CORS_ORIGIN_ALLOW_ALL = True
+DEBUG = config("DEBUG", default=False, cast=bool)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="*").split(",")
+
+# CORS — accept localhost in dev and the Vercel frontend in production
+_frontend = config("FRONTEND_URL", default="http://localhost:3000")
+CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
+    _frontend,
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
 CSRF_TRUSTED_ORIGINS = [
+    _frontend,
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:8001",
