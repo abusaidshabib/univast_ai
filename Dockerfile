@@ -17,4 +17,5 @@ RUN python train_model.py
 
 EXPOSE 8001
 
-CMD ["sh", "-c", "gunicorn univast_ai.wsgi:application --bind 0.0.0.0:${PORT:-8001} --workers 2"]
+# One worker keeps RSS under Render's free 512 MB plan (sklearn + pandas).
+CMD ["sh", "-c", "gunicorn univast_ai.wsgi:application --bind 0.0.0.0:${PORT:-8001} --workers 1 --timeout 120"]

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: univast-ai
+    runtime: docker
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: FRONTEND_URL
+        sync: false

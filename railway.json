@@ -4,8 +4,8 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "gunicorn univast_ai.wsgi:application --bind 0.0.0.0:$PORT --workers 2",
-    "healthcheckPath": "/api/v4/predict/",
+    "startCommand": "gunicorn univast_ai.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 120",
+    "healthcheckPath": "/healthz",
     "restartPolicyType": "ON_FAILURE"
   }
 }

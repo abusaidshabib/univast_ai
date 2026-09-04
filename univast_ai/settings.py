@@ -1,28 +1,45 @@
 from pathlib import Path
+import os
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="*").split(",")
 
-# CORS — accept localhost in dev and the Vercel frontend in production
-_frontend = config("FRONTEND_URL", default="http://localhost:3000")
-CORS_ORIGIN_ALLOW_ALL = False
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
+_hosts = [h.strip() for h in config("ALLOWED_HOSTS", default="*").split(",") if h.strip()]
+_render_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if _render_host and _render_host not in _hosts:
+    _hosts.append(_render_host)
+ALLOWED_HOSTS = _hosts
+
+# Render (and most PaaS hosts) terminate TLS in front of the app
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# CORS — localhost in dev, Vercel frontend in production
+_frontend = config("FRONTEND_URL", default="http://localhost:3000").rstrip("/")
+_cors_origins = [
     _frontend,
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
-CSRF_TRUSTED_ORIGINS = [
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(origin for origin in _cors_origins if origin))
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+]
+_csrf = [
     _frontend,
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:8001",
 ]
+_render_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
+if _render_url:
+    _csrf.append(_render_url)
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(origin for origin in _csrf if origin))
 
 # Application definition
 
